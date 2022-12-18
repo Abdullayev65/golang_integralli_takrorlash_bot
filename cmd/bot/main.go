@@ -11,9 +11,9 @@ import (
 func main() {
 	bot, err := tgbotapi.NewBotAPI(getToken.TokenFromConsole())
 	if err != nil {
+		fmt.Println(err)
 		log.Panic(err)
 	}
-	fmt.Println("")
 	bot.Debug = true
 
 	log.Printf("Authorized on account %s", bot.Self.UserName)

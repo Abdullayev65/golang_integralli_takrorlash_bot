@@ -1,10 +1,11 @@
 package service
 
 import (
-	"fmt"
+	"github.com/AbdullohAbdullayev/golang_integralli_takrorlash_bot.git/pkg/entity"
+	"github.com/AbdullohAbdullayev/golang_integralli_takrorlash_bot.git/pkg/repository"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"strconv"
 	"strings"
-	"time"
 )
 
 type Service struct {
@@ -43,18 +44,20 @@ func (s *Service) commands(update *tgbotapi.Update) {
 }
 
 func (s *Service) saveToSchedule(update *tgbotapi.Update) {
-	chatId := update.Message.Chat.ID
-	message := tgbotapi.NewMessage(chatId, "ishlavotti : "+update.Message.Text)
-
-	forward := tgbotapi.NewForward(chatId, chatId, update.Message.MessageID)
-	go func() {
-		time.Sleep(time.Second * 10)
-		fmt.Println(s.Bot.Send(forward))
-	}()
-	s.Bot.Send(message)
+	chatID, messageID := update.Message.Chat.ID, update.Message.MessageID
+	data := entity.NewData(chatID, messageID)
+	repository.SaveData(data)
+	messageToSend := entity.NewMessageToSend(data)
+	repository.SaveMessageToSend(messageToSend)
+	s.sendReply(chatID, "saved \nID["+strconv.Itoa(data.Id)+"]", messageID)
 }
 
-func (s *Service) send(chatId int64, text string) {
+func (s *Service) send(chatID int64, text string) {
+	message := tgbotapi.NewMessage(chatID, text)
+	s.Bot.Send(message)
+}
+func (s *Service) sendReply(chatId int64, text string, replyToMessageID int) {
 	message := tgbotapi.NewMessage(chatId, text)
+	message.ReplyToMessageID = replyToMessageID
 	s.Bot.Send(message)
 }

@@ -12,10 +12,7 @@ func Start(bot *tgbotapi.BotAPI) {
 	service := service.NewService(bot)
 
 	for update := range updates {
-		if update.Message != nil { // If we got a message
-			//log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-
-			//msg := tgbotapi.NewMessage(update.Message.Chat.ID, string(str))
+		if update.Message != nil {
 			service.GotReq(update)
 		}
 	}
