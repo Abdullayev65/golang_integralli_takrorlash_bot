@@ -9,7 +9,7 @@ func Start(bot *tgbotapi.BotAPI) {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 	updates := bot.GetUpdatesChan(u)
-	service := service.Service{bot}
+	service := service.NewService(bot)
 
 	for update := range updates {
 		if update.Message != nil { // If we got a message
