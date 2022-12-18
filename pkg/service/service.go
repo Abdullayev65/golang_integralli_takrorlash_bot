@@ -52,7 +52,6 @@ func (s *Service) saveToSchedule(update *tgbotapi.Update) {
 		fmt.Println(s.Bot.Send(forward))
 	}()
 	s.Bot.Send(message)
-
 }
 
 func (s *Service) send(chatId int64, text string) {
