@@ -33,9 +33,19 @@ func NewData(chatID int64, messageID int) *Data {
 	}
 }
 func NewMessageToSend(data *Data) *MessageToSend {
+	return ConstructorMTS(data, 1, data.CreatedAt+data.NextIntervalTime)
+}
+func ConstructorMTS(data *Data, sendingNumOfData int, timeToSend int64) *MessageToSend {
 	return &MessageToSend{
 		Data:             data,
-		SendingNumOfData: 1,
-		TimeToSend:       data.CreatedAt + data.NextIntervalTime,
+		SendingNumOfData: sendingNumOfData,
+		TimeToSend:       timeToSend,
+	}
+}
+func ConstructorData(id int, chatID int64, messageID int) *Data {
+	return &Data{
+		Id:        id,
+		ChatID:    chatID,
+		MessageID: messageID,
 	}
 }

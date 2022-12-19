@@ -84,6 +84,39 @@ func SaveMessageToSend(messageToSend *entity.MessageToSend) {
 	}
 }
 
+func GetSliceOfMTS(from, to int64) []entity.MessageToSend {
+	query := fmt.Sprintf(
+		"SELECT time_to_send, data_id, chat_id, message_id FROM message_to_send AS m JOIN e_data AS d on d.id = m.data_id AND d.active  WHERE m.time_to_send BETWEEN %d AND %d ", from, to)
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil
+	}
+	defer rows.Close()
+
+	sliceMTS := make([]entity.MessageToSend, 0, 20)
+
+	for rows.Next() {
+		mts := scanAndMap(rows)
+		if err != nil {
+			log.Println(err)
+			return nil
+		}
+		sliceMTS = append(sliceMTS, *mts)
+	}
+	return sliceMTS
+}
+
+func ContinueLoop(messageToSend entity.MessageToSend) {
+	//TODO
+}
+
+// private
+func scanAndMap(rows *sql.Rows) *entity.MessageToSend {
+	var timeToSend, dataID, chatID, messageID interface{}
+	rows.Scan(&timeToSend, &dataID, &chatID, &messageID)
+	data := entity.ConstructorData(int(parseInt(dataID)), parseInt(chatID), int(parseInt(messageID)))
+	return entity.ConstructorMTS(data, -1, parseInt(timeToSend))
+}
 func setDataID(data *entity.Data) error {
 	query := fmt.Sprintf("SELECT id FROM e_data WHERE chat_id = %d AND message_id = %d",
 		data.ChatID, data.MessageID)
@@ -94,4 +127,20 @@ func setDataID(data *entity.Data) error {
 	}
 	rows.Next()
 	return rows.Scan(&data.Id)
+}
+
+func parseInt(i interface{}) (n int64) {
+	switch i.(type) {
+	case int:
+		n = int64(i.(int))
+	case int8:
+		n = int64(i.(int8))
+	case int16:
+		n = int64(i.(int16))
+	case int32:
+		n = int64(i.(int32))
+	case int64:
+		n = i.(int64)
+	}
+	return n
 }
