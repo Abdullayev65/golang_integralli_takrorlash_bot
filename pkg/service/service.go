@@ -4,7 +4,6 @@ import (
 	"github.com/AbdullohAbdullayev/golang_integralli_takrorlash_bot.git/pkg/entity"
 	"github.com/AbdullohAbdullayev/golang_integralli_takrorlash_bot.git/pkg/repository"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"strconv"
 	"strings"
 )
 
@@ -49,7 +48,7 @@ func (s *Service) saveToSchedule(update *tgbotapi.Update) {
 	repository.SaveData(data)
 	messageToSend := entity.NewMessageToSend(data)
 	repository.SaveMessageToSend(messageToSend)
-	s.sendReply(chatID, "saved \nID["+strconv.Itoa(data.Id)+"]", messageID)
+	s.sendReply(chatID, "saved", messageID)
 }
 
 func (s *Service) send(chatID int64, text string) {

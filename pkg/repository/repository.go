@@ -105,9 +105,9 @@ func GetSliceOfMTS(from, to int64) []entity.MessageToSend {
 	}
 	return sliceMTS
 }
-
-func ContinueLoop(messageToSend entity.MessageToSend) {
-	//TODO
+func UpdateNextIntervalTime(data *entity.Data) {
+	query := "UPDATE e_data SET next_interval_time = next_interval_time * increasing_coefficient WHERE id = " + string(data.Id)
+	db.Exec(query)
 }
 
 // private
