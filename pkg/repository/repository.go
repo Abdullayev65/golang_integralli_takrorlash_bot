@@ -6,7 +6,6 @@ import (
 	"github.com/AbdullohAbdullayev/golang_integralli_takrorlash_bot.git/pkg/entity"
 	_ "github.com/lib/pq"
 	"log"
-	"net/http"
 )
 
 var db *sql.DB
@@ -29,37 +28,6 @@ func init() {
 		panic(err)
 	}
 	fmt.Println("Now we are connected to POSTGRESQL DATABASE.")
-}
-
-func dataRecord(w http.ResponseWriter, r *http.Request) {
-	rows, err := db.Query("SELECT * FROM newtable")
-
-	if err != nil {
-		http.Error(w, http.StatusText(500), http.StatusInternalServerError)
-		return
-	}
-	defer rows.Close()
-
-	snbs := make([]sandbox, 0)
-
-	for rows.Next() {
-		snb := sandbox{}
-		err := rows.Scan(&snb.id, &snb.Firstname, &snb.Lastname, &snb.Age)
-		if err != nil {
-			log.Println(err)
-			http.Error(w, http.StatusText(500), 500)
-			return
-		}
-		snbs = append(snbs, snb)
-	}
-	if err = rows.Err(); err != nil {
-		http.Error(w, http.StatusText(500), 500)
-		return
-	}
-
-	for _, snb := range snbs {
-		fmt.Fprintf(w, "%d %s %s %d\n", snb.id, snb.Firstname, snb.Lastname, snb.Age)
-	}
 }
 
 func SaveData(data *entity.Data) {
