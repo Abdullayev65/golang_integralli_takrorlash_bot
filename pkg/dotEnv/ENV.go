@@ -8,7 +8,7 @@ import (
 var EnvMap map[string]string
 
 func init() {
-	envMap, err := godotenv.Read(".env")
+	envMap, err := godotenv.Read("my_env")
 	if err != nil {
 		fmt.Println(".env NOT FOUND")
 		panic(err)
