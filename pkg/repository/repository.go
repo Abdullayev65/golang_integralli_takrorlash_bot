@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"fmt"
+	"github.com/AbdullohAbdullayev/golang_integralli_takrorlash_bot.git/pkg/dotEnv"
 	"github.com/AbdullohAbdullayev/golang_integralli_takrorlash_bot.git/pkg/entity"
 	_ "github.com/lib/pq"
 	"log"
@@ -11,15 +12,13 @@ import (
 var db *sql.DB
 var err error
 
-type sandbox struct {
-	id        int
-	Firstname string
-	Lastname  string
-	Age       int
-}
-
 func init() {
-	connStr := "postgres://postgres:1@localhost/postgres?sslmode=disable"
+	host := dotEnv.EnvMap["HOST"]
+	//"localhost"
+	fmt.Println("host = ", host)
+	//connStr := "postgres://postgres:1@" + host + "/postgres?sslmode=disable"
+	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, 5432, "postgres", "1", "postgres")
+
 	db, err = sql.Open("postgres", connStr)
 	if err != nil {
 		panic(err)
