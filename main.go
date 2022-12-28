@@ -17,8 +17,7 @@ func main() {
 		fmt.Println(err)
 		log.Panic(err)
 	}
-	bot.Debug = true
-
+	//bot.Debug = true
 	log.Printf("Authorized on account %s", bot.Self.UserName)
 	telegram.Start(bot)
 }

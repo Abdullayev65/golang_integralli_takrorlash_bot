@@ -1,4 +1,4 @@
-create table e_data
+CREATE TABLE IF NOT EXISTS e_data
 (
     id                    serial primary key,
     chat_id               bigint        not null,
@@ -9,7 +9,7 @@ create table e_data
     active                bool,
     CONSTRAINT chat_mess_un UNIQUE (chat_id,message_id)
 );
-create table message_to_send
+CREATE TABLE IF NOT EXISTS message_to_send
 (
     data_id             int,
     sending_num_of_data int,

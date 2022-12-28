@@ -7,17 +7,14 @@ import (
 	"github.com/AbdullohAbdullayev/golang_integralli_takrorlash_bot.git/pkg/entity"
 	_ "github.com/lib/pq"
 	"log"
+	"os"
 )
 
 var db *sql.DB
 var err error
 
 func init() {
-	host := dotEnv.EnvMap["HOST"]
-	//"localhost"
-	fmt.Println("host = ", host)
-	//connStr := "postgres://postgres:1@" + host + "/postgres?sslmode=disable"
-	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, 5432, "postgres", "1", "postgres")
+	connStr := dotEnv.EnvMap["DB_Conn"]
 
 	db, err = sql.Open("postgres", connStr)
 	if err != nil {
@@ -27,6 +24,10 @@ func init() {
 		panic(err)
 	}
 	fmt.Println("Now we are connected to POSTGRESQL DATABASE.")
+	b, e := os.ReadFile("database.sql")
+	if e == nil {
+		db.Exec(string(b))
+	}
 }
 
 func SaveData(data *entity.Data) {

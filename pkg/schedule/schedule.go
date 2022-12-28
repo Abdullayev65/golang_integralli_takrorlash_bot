@@ -1,11 +1,10 @@
 package schedule
 
 import (
-	"fmt"
 	"github.com/AbdullohAbdullayev/golang_integralli_takrorlash_bot.git/pkg/entity"
 	"github.com/AbdullohAbdullayev/golang_integralli_takrorlash_bot.git/pkg/repository"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"strings"
+	"log"
 	"time"
 )
 
@@ -46,7 +45,7 @@ func (s *Schedule) Loop() {
 func (s *Schedule) sendReply(messageToSend entity.MessageToSend) {
 	forward := tgbotapi.NewForward(messageToSend.ChatID, messageToSend.ChatID, messageToSend.MessageID)
 	if _, err := s.Bot.Send(forward); err != nil {
-		fmt.Println(strings.Repeat("___________\n", 3))
+		log.Println(err)
 		// TODO if err try to send it again in three minutes
 		return
 	}
