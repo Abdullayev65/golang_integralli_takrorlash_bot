@@ -2,12 +2,14 @@ package repository
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/AbdullohAbdullayev/golang_integralli_takrorlash_bot.git/pkg/dotEnv"
 	"github.com/AbdullohAbdullayev/golang_integralli_takrorlash_bot.git/pkg/entity"
 	_ "github.com/lib/pq"
 	"log"
 	"os"
+	"strconv"
 )
 
 var db *sql.DB
@@ -31,15 +33,16 @@ func init() {
 }
 
 func SaveData(data *entity.Data) {
-	query := fmt.Sprintf("INSERT INTO e_data(chat_id, message_id, created_at, next_interval_time, increasing_coefficient, active) VALUES(%d, %d, %d , %d,  %.3f, %t)",
+	query := fmt.Sprintf("INSERT INTO e_data(chat_id, message_id, created_at, next_interval_time, increasing_coefficient, active) VALUES(%d, %d, %d , %d,  %.3f, %t) RETURNING id",
 		data.ChatID, data.MessageID, data.CreatedAt,
 		data.NextIntervalTime, data.IncreasingCoefficient, data.Active)
-	_, err := db.Exec(query)
+	row, err := db.Query(query)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	setDataID(data)
+	row.Next()
+	row.Scan(&data.Id)
 }
 
 func SaveMessageToSend(messageToSend *entity.MessageToSend) {
@@ -76,6 +79,24 @@ func GetSliceOfMTS(from, to int64) []entity.MessageToSend {
 func UpdateNextIntervalTime(data *entity.Data) {
 	query := "UPDATE e_data SET next_interval_time = next_interval_time * increasing_coefficient WHERE id = " + string(data.Id)
 	db.Exec(query)
+}
+func GetIdOfData(messageId int, chatID int64) (int, error) {
+	query := fmt.Sprintf("SELECT id FROM e_data WHERE chat_id = %d AND message_id = %d;", chatID, messageId)
+	rows, err := db.Query(query)
+	if err != nil {
+		return 0, err
+	}
+	if !rows.Next() {
+		return 0, errors.New("NOT FOUNDED")
+	}
+	id := 0
+	rows.Scan(&id)
+	return id, nil
+}
+func UpdateK(dataID int, newK float64) error {
+	query := "UPDATE e_data SET increasing_coefficient = $1 WHERE id = " + strconv.Itoa(dataID)
+	_, err = db.Exec(query, newK)
+	return err
 }
 
 // private
