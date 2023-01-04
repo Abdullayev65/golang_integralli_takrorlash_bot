@@ -12,6 +12,7 @@ import (
 var (
 	exampleOfUpdateK   = "/k newK in id \n/k 1.6 in 37 - 1.6 koifsentni 37 id dagi xabarga joylash \n0.3 > k > 10; id xabar saqlanganda berilgan"
 	comHelp            = readFile("textes/command-help")
+	comStart           = readFile("textes/command-start")
 	comAdvises         = readFile("textes/command-advises")
 	advisesPhotoFIleID = tgbotapi.FileID("AgACAgIAAxkBAAOrY7PMeJetll91zRC9obfEnbZXLmAAAm_HMRuNiaBJppgJil1ij18BAAMCAANzAAMtBA")
 )
@@ -39,6 +40,8 @@ func (s *Service) commands(update *tgbotapi.Update) {
 	switch text {
 	case "/help":
 		s.send(chatID, comHelp)
+	case "/start":
+		s.send(chatID, comStart)
 	case "/advises":
 		{
 			photoCon := tgbotapi.NewPhoto(chatID, advisesPhotoFIleID)
