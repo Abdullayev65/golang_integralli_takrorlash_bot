@@ -46,9 +46,9 @@ func SaveData(data *entity.Data) {
 }
 
 func SaveMessageToSend(messageToSend *entity.MessageToSend) {
-	query := fmt.Sprintf("INSERT INTO message_to_send(data_id, sending_num_of_data , time_to_send) VALUES (%d, %d, %d )",
+	query := fmt.Sprintf("INSERT INTO message_to_send(data_id, sending_num_of_data , time_to_send) VALUES ($1, $2, $3 )")
+	_, err := db.Exec(query,
 		messageToSend.Data.Id, messageToSend.SendingNumOfData, messageToSend.TimeToSend)
-	_, err := db.Exec(query)
 	if err != nil {
 		log.Println(err)
 		return
@@ -57,7 +57,7 @@ func SaveMessageToSend(messageToSend *entity.MessageToSend) {
 
 func GetSliceOfMTS(from, to int64) []entity.MessageToSend {
 	query := fmt.Sprintf(
-		"SELECT time_to_send, data_id, chat_id, message_id FROM message_to_send AS m JOIN e_data AS d on d.id = m.data_id AND d.active  WHERE m.time_to_send BETWEEN %d AND %d ", from, to)
+		"SELECT time_to_send, data_id, chat_id, message_id, next_interval_time, sending_num_of_data FROM message_to_send AS m JOIN e_data AS d on d.id = m.data_id AND d.active  WHERE m.time_to_send BETWEEN %d AND %d ", from, to)
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil
@@ -77,8 +77,8 @@ func GetSliceOfMTS(from, to int64) []entity.MessageToSend {
 	return sliceMTS
 }
 func UpdateNextIntervalTime(data *entity.Data) {
-	query := "UPDATE e_data SET next_interval_time = next_interval_time * increasing_coefficient WHERE id = " + string(data.Id)
-	db.Exec(query)
+	query := "UPDATE e_data SET next_interval_time = next_interval_time * increasing_coefficient WHERE id = $1"
+	db.Exec(query, data.Id)
 }
 func GetIdOfData(messageId int, chatID int64) (int, error) {
 	query := fmt.Sprintf("SELECT id FROM e_data WHERE chat_id = %d AND message_id = %d;", chatID, messageId)
@@ -101,10 +101,10 @@ func UpdateK(dataID int, newK float64) error {
 
 // private
 func scanAndMap(rows *sql.Rows) *entity.MessageToSend {
-	var timeToSend, dataID, chatID, messageID interface{}
-	rows.Scan(&timeToSend, &dataID, &chatID, &messageID)
-	data := entity.ConstructorData(int(parseInt(dataID)), parseInt(chatID), int(parseInt(messageID)))
-	return entity.ConstructorMTS(data, -1, parseInt(timeToSend))
+	var timeToSend, dataID, chatID, messageID, nextIntervalTime, sendingNum interface{}
+	rows.Scan(&timeToSend, &dataID, &chatID, &messageID, &nextIntervalTime, &sendingNum)
+	data := entity.ConstructorData(int(parseInt(dataID)), parseInt(chatID), int(parseInt(messageID)), parseInt(nextIntervalTime))
+	return entity.ConstructorMTS(data, int(parseInt(sendingNum)), parseInt(timeToSend))
 }
 func setDataID(data *entity.Data) error {
 	query := fmt.Sprintf("SELECT id FROM e_data WHERE chat_id = %d AND message_id = %d",
